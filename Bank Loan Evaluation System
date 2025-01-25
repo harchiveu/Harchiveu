@@ -1,0 +1,104 @@
+#include <iostream>
+#include <string>
+#include <cmath> 
+
+using namespace std;
+
+int main () {
+    char proceed = 'Y';
+    do {
+    // Variables for the Applicant's Information 
+        string name;
+        int age, creditScore, loanTerm;
+        double annualIncome, loanAmount;
+        char existingLoan;
+        
+        cout << "Enter applicant's name: ";
+        getline (cin, name);
+        cout << "Enter applicant's age: ";
+        cin >> age;
+        cout << "Enter applicant's annual income: ";
+        cin >> annualIncome;
+        cout << "Enter applicant's credit score: ";
+        cin >> creditScore;
+        cout << "Enter loan amount requested: ";
+        cin >> loanAmount;
+        cout << "Enter loan term (in years): ";
+        cin >> loanTerm;
+        cout << "Does the applicant have an existing loan? (Y/N): ";
+        cin >> existingLoan;
+        
+        // Initialize variables for the results
+        bool isEligible = true;
+        string reasons = "";
+        
+        // Eligibility Conditions
+        if (age < 21 || age > 60) {
+            isEligible = false;
+            reasons += "- Applicant's age is not within the valid range (21-60).\n";
+        }
+        
+        if ((loanAmount < 50000 && annualIncome < 30000) || (loanAmount >= 50000 &&  loanAmount <= 100000 && annualIncome < 50000) || (loanAmount > 100000 && annualIncome < 80000)) {
+            isEligible = false;
+            reasons += "- Annual income does not meet the required threshold for loans over " + to_string((int)loanAmount) + ".\n";
+        } 
+        
+        if (creditScore < 700){
+            isEligible = false;
+            reasons += "- Credit score is below the minimum requirement of 700.\n";
+        }
+        
+        if (loanTerm < 1 || loanTerm > 10) {
+            isEligible = false;
+            reasons += "- Loan term is not within the valid range (1-10).\n";
+        }
+        
+        if (existingLoan == 'Y' || existingLoan == 'y'){
+            isEligible = false;
+            reasons += "- Applicant already has an existing loan from the bank.\n";
+        }
+        
+        // Display the results
+        cout << "Loan application for " << name << ":\n";
+        
+        // When Approved:
+        // Calculating Interest Rate
+        double interestRate = 0;
+        if (isEligible){
+            if (annualIncome > 100000){
+                interestRate = .04; // Discounted Rate
+            } else if (annualIncome < 50000){
+            interestRate = .08; // Premium Rate
+        } else {
+            interestRate = .06; // Standard Rate
+        } 
+        }
+        
+        // Calculating Monthly Amortization
+        double monthlyRate = interestRate / 12;
+        int totalPayments = loanTerm * 12;
+        double monthlyAmortization = loanAmount * monthlyRate / (1 - pow(1 + monthlyRate, -totalPayments));
+        
+        // Loan Approval Result
+        if (isEligible){
+            cout << "Loan Application result for " << name << ":\n";
+            cout << "Status: Approved\n";
+            cout << "Applicable Interest Rate: " << interestRate * 100 << "%\n";
+            cout << "Loan Term: " << loanTerm << " years\n";
+            cout << "Monthly Amortization: PHP " << monthlyAmortization << endl;
+        } else {
+            cout << "Status: Rejected\n";
+            cout << "Reason(s): \n" << reasons << endl;
+        }
+
+        // Ask if the user wants to compute for another loan
+        cout << "\nDo you want to evaluate another loan? (Y/N): ";
+        cin >> proceed;
+        cin.ignore(); // To ignore the newline character left by cin
+        
+    } while (proceed == 'Y' || proceed == 'y'); // Repeat the loop if the user enters 'Y' or 'y'
+
+    cout << "Thank you for using the loan evaluation system!" << endl;
+    
+    return 0;
+}
